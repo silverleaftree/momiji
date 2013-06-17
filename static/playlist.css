@@ -1,0 +1,51 @@
+.queue_element {
+  float: left;
+  margin: 5px;
+}
+.queue_element_title {
+  width: 135px;
+  height: 55px;
+}
+.queue_element_controls {
+  width: 135px;
+}
+.player_controls {
+  float: left;
+}
+.yt_thumbnail {
+  width: 135px;
+  cursor: pointer;
+}
+.nav_element {
+  float: left;
+  margin: 5px;
+}
+.nav_controls {
+  clear: both;
+  float: left;
+  margin: 5px;
+}
+.player_debug {
+  clear: both;
+}
+.video_queue {
+  clear: both;
+  margin: 25px;
+}
+.queue_header {
+  font-weight: bold;
+  font-size: large;
+}
+.curate_link {
+  float: right;
+}
+.add_video {
+  float: left;
+}
+.player_column {
+  margin: 10px;
+  width: 640px;
+}
+.player {
+  clear: both;
+}

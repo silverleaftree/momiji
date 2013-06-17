@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/static/playlist.css" />
+  </head>
+<body>
+Select playlist: <br />
+<div>
+{% for p in playlists %}
+  <div class="nav_element">
+    <div class="nav_element_title"> {{p}} </div>
+    <a href="?playlist={{p}}">
+      <img class="yt_thumbnail" src="http://i3.ytimg.com/vi/{{p.seed_track.video_id}}/hqdefault.jpg" />
+    <a>
+  </div>
+{% endfor %}
+</div>
+<div class="nav_controls">
+<a href="new_playlist">Create new playlist</a>
+</div>
+</body>
+</html>

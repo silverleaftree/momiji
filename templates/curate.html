@@ -1,0 +1,73 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/static/playlist.css" />
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script>
+  function modify_track(video_id, state) {
+    $.get("/playapp/modify_track/?force=1&playlist={{playlist}}&video_id=" + video_id+ "&state=" + state, function(data) {
+      location.reload();
+    });
+  }
+</script>
+</head>
+<h2>Curating playlist: <a href="/playapp/?playlist={{playlist}}">{{playlist}}</a></h2>
+
+<div class="player_debug">
+  Libary:
+  <table border=1>
+  <tr>
+    <th> title </th>
+    <th> thumb </th>
+    <th> video_id </th>
+    <th> state </th>
+    <th> controls </th>
+  </tr>
+  {% for track in library %}
+  <tr>
+    <td> {{track.title}} </td>
+    <td>
+      <a href="/playapp/?playlist={{playlist}}&video_id={{track.video_id}}">
+      <img class="yt_thumbnail" src="http://i3.ytimg.com/vi/{{track.video_id}}/hqdefault.jpg" height="100" />
+      </a>
+    </td>
+    <td> {{track.video_id}} </td>
+    <td> {{track.state}} </td>
+    <td>
+      {% if track.state != 'S' %}
+      <button onclick="modify_track('{{track.video_id}}', 'P')">Mark positive</button>
+      <button onclick="modify_track('{{track.video_id}}', 'V')">Mark viewed</button>
+      <button onclick="modify_track('{{track.video_id}}', 'N')">Mark negative</button>
+      <button onclick="modify_track('{{track.video_id}}', 'U')">Forget</button>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  </table>
+
+  Upcoming:
+  <table border=1>
+  <tr>
+    <th> title </th>
+    <th> thumb </th>
+    <th> video_id </th>
+    <th> weight </th>
+    <th> recently_played </th>
+  </tr>
+  {% for track in upcoming %}
+  <tr>
+    <td> {{track.title}} </td>
+    <td>
+      <a href="/playapp/?playlist={{playlist}}&video_id={{track.video_id}}">
+      <img class="yt_thumbnail" src="http://i3.ytimg.com/vi/{{track.video_id}}/hqdefault.jpg" />
+      </a>
+    </td>
+    <td> {{track.video_id}} </td>
+    <td> {{track.weight}} </td>
+    <td> {{track.recently_played}} </td>
+  </tr>
+  {% endfor %}
+
+</table>
+</div>
+</body>
+<html>

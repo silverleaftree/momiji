@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/static/playlist.css" />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <script>
+      // keep in sync with views.DELIMITER
+      var DELIMITER = "::VzVQxrhNTX::";
+      // keep in sync with recommendation_engine.QUEUE_SIZE
+      var QUEUE_SIZE = 5;
+      var THUMB_PRE = "http://i3.ytimg.com/vi/";
+      var THUMB_POST = "/hqdefault.jpg";
+
+      // use lastSeen so we don't doublecount markPlayed calls.
+      var lastSeen = "";
+      var currentId = "{{ video_id }}";
+      var playlist = "{{ playlist }}";
+
+      var queue = new Array();
+      {% for track in queue %}
+        queue.push(make_track("{{ track.video_id }}", "{{ track.title }}"));
+      {% endfor %}
+      var queue_titles = new Array();
+      var queue_imgs = new Array();
+
+      var suggestions = new Array();
+      var suggest_titles = new Array();
+      var suggest_imgs = new Array();
+
+
+      // Start Youtube code
+      // 2. This code loads the IFrame Player API code asynchronously.
+      var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //    after the API code downloads.
+      var player;
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+          height: '390',
+          width: '640',
+          videoId: currentId,
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+      }
+
+      // 4. The API will call this function when the video player is ready.
+      function onPlayerReady(event) {
+
+        for (var i = 0; i < QUEUE_SIZE; i++) {
+          queue_titles.push(document.getElementById('queue_title_' + i));
+          queue_imgs.push(document.getElementById('queue_img_' + i));
+          suggest_titles.push(document.getElementById('suggest_title_' + i));
+          suggest_imgs.push(document.getElementById('suggest_img_' + i));
+        }
+        event.target.playVideo();
+        refresh_queue();
+        refresh_suggestions();
+      }
+
+      // 5. The API calls this function when the players state changes.
+      //    The function indicates that when playing a video (state=1),
+      //    the player should play for six seconds and then stop.
+      function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.ENDED ) {
+          finishedPlaying();
+        } else if ( event.data = YT.PlayerState.PLAYING ) {
+          startedPlaying();
+        }
+      }
+      // End youtube code
+
+
+      function startedPlaying() {
+        if (lastSeen != currentId) {
+          lastSeen = currentId;
+          $.get("mark_played/?playlist=" + playlist + "&video_id=" + currentId, function(data) {});
+        }
+      }
+
+      function finishedPlaying() {
+        $.get("modify_track/?playlist=" + playlist + "&video_id=" + currentId + "&state=V", function(data) {
+          nextVideo();
+        });
+      }
+
+      function nextVideo() {
+        currentId = queue.shift().video_id;
+        player.loadVideoById(currentId);
+        queue_another();
+      }
+
+      function queue_another() {
+        $.get("generate/?playlist=" + playlist, function(data) {
+          queue.push(parse_track(data));
+          refresh_queue();
+        });
+      }
+
+      function refresh_queue() {
+        for (var i = 0; i < QUEUE_SIZE; i++) {
+          queue_imgs[i].src = THUMB_PRE + queue[i].video_id + THUMB_POST;
+          queue_titles[i].innerHTML = queue[i].title.substring(0,35);
+        }
+      }
+
+      function thumbsDown() {
+        $.get(
+          "modify_track/?playlist=" + playlist + "&video_id=" + currentId + "&state=N",
+          function(data) {
+            nextVideo();
+          });
+      }
+
+      function thumbsUp() {
+        $.get("modify_track/?playlist=" + playlist + "&video_id=" + currentId + "&state=P", function(data) {});
+      }
+
+      function remove_from_queue(index) {
+        queue.splice(index,1);
+        queue_another();
+      }
+
+      function thumbs_down_from_queue(index) {
+        $.get(
+          "modify_track/?playlist=" + playlist + "&video_id=" + queue[index].video_id + "&state=N",
+          function(data) {
+            queue.splice(index,1);
+            queue_another();
+          });
+      }
+
+      function play_now(index) {
+        player.loadVideoById(queue[index].video_id);
+        remove_from_queue(index);
+      }
+
+      function suggest_play_now(index) {
+        player.loadVideoById(suggestions[index].video_id);
+        $.get("modify_track/?playlist=" + playlist + "&video_id=" + suggestions[index].video_id + "&state=V", function(data) {
+          refresh_suggestions();
+        });
+      }
+
+      function suggest_thumbs_down(index) {
+        $.get("modify_track/?playlist=" + playlist + "&video_id=" + suggestions[index].video_id + "&state=N", function(data) {
+          refresh_suggestions();
+        });
+      }
+
+      function refresh_suggestions() {
+        $.get("get_suggestions/?playlist=" + playlist, function(data) {
+          var parsed = data.split(DELIMITER);
+          suggestions = new Array();
+          for (var i = 0; i < QUEUE_SIZE; i++) {
+            suggestions.push(make_track(parsed[i*2], parsed[i*2 + 1]));
+          }
+          console.log("refreshed: " + suggestions);
+          for (var i = 0; i < QUEUE_SIZE; i++) {
+            suggest_imgs[i].src = THUMB_PRE + suggestions[i].video_id + THUMB_POST;
+            suggest_titles[i].innerHTML = suggestions[i].title.substring(0,35);
+          }
+        });
+      }
+
+      function tired() {
+        $.get("mark_played/?playlist=" + playlist + "&video_id=" + currentId + "&tired=1", function(data) {
+          nextVideo();
+        });
+      }
+
+      function parse_track(response) {
+        var track = new Object();
+        var parsed = response.split(DELIMITER);
+        track.video_id = parsed[0];
+        track.title = parsed[1];
+        return track;
+      }
+
+      function make_track(video_id, title) {
+        var track = new Object();
+        track.video_id = video_id;
+        track.title = title;
+        return track;
+      }
+
+    </script>
+       <a href="/playapp/"> Navigate<a>
+
+    <h2> Listening to: {{ playlist }} </h2>
+  <div class="player_column">
+    <div class="add_video">
+    <form action="/playapp/add_track/">
+      <input type="hidden" name="playlist" value="{{ playlist }}" />
+      Add another videoId: <input type="text" name="video_id" />
+    </form>
+    </div>
+    <div class="curate_link">
+      <a href="/playapp/curate/?playlist={{playlist}}">Curate {{playlist}}</a>
+    </div>
+  </div>
+<div class="player">
+  <div id="player"></div>
+</div>
+<div id="player_controls">
+  <button onclick="thumbsUp()">Thumbs up!</button>
+  <button onclick="thumbsDown()">Thumbs down!</button>
+  <button onclick="nextVideo()">Next video</button>
+  <button onclick="tired()">I'm tired of this track</button>
+</div>
+
+  <div class="video_queue">
+    <div class="queue_header"> Upcoming...</div>
+    {% for track in queue %}
+      <div class="queue_element">
+        <div class="queue_element_title" id="queue_title_{{forloop.counter0}}" >
+	      </div>
+        <img class="yt_thumbnail" id="queue_img_{{forloop.counter0}}" src="" onclick="play_now({{forloop.counter0}})" />
+        <div class="queue_element_controls">
+          <button onclick="remove_from_queue({{forloop.counter0}})">X</button>
+          <button onclick="thumbs_down_from_queue({{forloop.counter0}})">Thumbs down!</button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <div class="video_queue">
+    <div class="queue_header"> You might like...</div>
+    {% for track in queue %}
+      <div class="queue_element">
+        <div class="queue_element_title" id="suggest_title_{{forloop.counter0}}" > {{track}}
+        </div>
+        <img class="yt_thumbnail" id="suggest_img_{{forloop.counter0}}" src="" onclick="suggest_play_now({{forloop.counter0}})" />
+        <div class="queue_element_controls">
+          <button onclick="suggest_thumbs_down({{forloop.counter0}})">Not Interested</button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+
+{% if library %}
+<div class="player_debug">
+  Libary:
+  <table border=1>
+  <tr>
+    <th> title </th>
+    <th> thumb </th>
+    <th> video_id </th>
+    <th> state </th>
+    <th> recently_played </th>
+  </tr>
+  {% for track in library %}
+  <tr>
+    <td> {{track.title}} </td>
+    <td>
+      <a href="/playapp/?playlist={{playlist}}&video_id={{track.video_id}}">
+      <img class="yt_thumbnail" src="http://i3.ytimg.com/vi/{{track.video_id}}/hqdefault.jpg" height="100" />
+      </a>
+    </td>
+    <td> {{track.video_id}} </td>
+    <td> {{track.state}} </td>
+    <td> {{track.recently_played}} </td>
+  </tr>
+  {% endfor %}
+  </table>
+
+  Upcoming:
+  <table border=1>
+  <tr>
+    <th> title </th>
+    <th> thumb </th>
+    <th> video_id </th>
+    <th> weight </th>
+    <th> recently_played </th>
+  </tr>
+  {% for track in upcoming %}
+  <tr>
+    <td> {{track.title}} </td>
+    <td>
+      <a href="/playapp/?playlist={{playlist}}&video_id={{track.video_id}}">
+      <img src="http://i3.ytimg.com/vi/{{track.video_id}}/hqdefault.jpg" height="100" />
+      </a>
+    </td>
+    <td> {{track.video_id}} </td>
+    <td> {{track.weight}} </td>
+    <td> {{track.recently_played}} </td>
+  </tr>
+  {% endfor %}
+
+</table>
+</div>
+{% endif %}
+  </body>
+</html>
+
+
