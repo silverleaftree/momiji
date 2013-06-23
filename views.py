@@ -21,10 +21,6 @@ def playing(request):
   
   if not video_id:
     video_id = engine.generate_recommendation(playlist).video_id
-  library = None
-  upcoming = None
-  if deb_arg == '1':
-    library, upcoming = engine.get_ordered_library(playlist)
   queue = engine.generate_queue(playlist)
   
   context = Context({
@@ -32,8 +28,6 @@ def playing(request):
     'playlists': Playlist.objects.all(),
     'queue': queue,
     'video_id': video_id, 
-    'library': library, 
-    'upcoming': upcoming,
   })
   return HttpResponse(template.render(context))
 
@@ -57,7 +51,10 @@ def generate(request):
 
 def new_playlist(request):
   # render the new playlist form
-  context = Context({})
+  video_id = request.GET.get('video_id', '')
+  context = Context({  
+    'video_id': video_id,
+    })
   template = loader.get_template('new_playlist.html')
   return HttpResponse(template.render(context))
 

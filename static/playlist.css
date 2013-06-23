@@ -11,6 +11,7 @@
 }
 .player_controls {
   float: left;
+  width: 640px;
 }
 .yt_thumbnail {
   width: 135px;
@@ -36,10 +37,11 @@
   font-weight: bold;
   font-size: large;
 }
-.curate_link {
+
+.player_upper_right {
   float: right;
 }
-.add_video {
+.player_upper_left {
   float: left;
 }
 .player_column {
