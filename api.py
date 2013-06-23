@@ -22,14 +22,15 @@ def get_title(video_id):
   conn.request('GET', API_URL % video_id)
   xml = ET.fromstring(conn.getresponse().read())
   return xml.find(TITLE_TAG).text
-  
+
+
 def get_related_videos(video_id):
   root = get_rec_xml_from_server(video_id)
   ids = []
   for entry_element in root.findall(ENTRY_TAG):
     ids.append(get_id_from_entry_element(entry_element))
   return ids
-  
+
 
 def get_id_from_entry_element(element):
   return re.split(':', element.find(ID_TAG).text)[3]

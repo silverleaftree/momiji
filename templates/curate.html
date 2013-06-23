@@ -10,7 +10,12 @@
   }
 </script>
 </head>
-<h2>Curating playlist: <a href="/playapp/?playlist={{playlist}}">{{playlist}}</a></h2>
+<h2>Curating playlist: <a href="../?playlist={{playlist}}">{{playlist}}</a></h2>
+
+<form action="../delete_playlist/?" onsubmit="return confirm('Are you sure you want to delete this playlist?')">
+<input type="hidden" name="playlist" value="{{playlist}}" />
+<input type="submit" value="Delete this playlist" />
+</a>
 
 <div class="player_debug">
   Libary:
@@ -26,7 +31,7 @@
   <tr>
     <td> {{track.title}} </td>
     <td>
-      <a href="/playapp/?playlist={{playlist}}&video_id={{track.video_id}}">
+      <a href="../?playlist={{playlist}}&video_id={{track.video_id}}">
       <img class="yt_thumbnail" src="http://i3.ytimg.com/vi/{{track.video_id}}/hqdefault.jpg" height="100" />
       </a>
     </td>
@@ -57,7 +62,7 @@
   <tr>
     <td> {{track.title}} </td>
     <td>
-      <a href="/playapp/?playlist={{playlist}}&video_id={{track.video_id}}">
+      <a href="../?playlist={{playlist}}&video_id={{track.video_id}}">
       <img class="yt_thumbnail" src="http://i3.ytimg.com/vi/{{track.video_id}}/hqdefault.jpg" />
       </a>
     </td>

@@ -129,6 +129,11 @@ def curate(request):
   return HttpResponse(template.render(context))
 
 
+def delete_playlist(request):
+  playlist = request.GET.get('playlist', '')
+  engine.delete_playlist(playlist)
+  return render_landing()
+
 
 def get_url(playlist, video_id):
   return '/playapp/?playlist=' + playlist + "&video_id=" + video_id 

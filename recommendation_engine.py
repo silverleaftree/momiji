@@ -129,6 +129,7 @@ def initialize_playlist(playlist, video_id_input):
   playlist_model = Playlist(name=playlist, creation_date=datetime.now())
   playlist_model.save()
   set_track_in_db(playlist, video_id_input, Track.SEED)
+  return True
   
 def playlist_has_video(playlist_model, video_id):
   return playlist_model.track_set.filter(video_id=video_id)
@@ -153,4 +154,10 @@ def get_playlists_and_seeds():
 
 def get_suggestions(playlist):
   playlist_model = Playlist.objects.get(name=playlist)
-  return playlist_model.track_set.filter(state=Track.UNVIEWED).filter(weight__gt=0).order_by('-weight')[:QUEUE_SIZE]
+  positive_tracks = playlist_model.track_set.filter(state=Track.UNVIEWED).filter(weight__gt=0)
+  return positive_tracks.order_by('-weight')[:QUEUE_SIZE]
+
+def delete_playlist(playlist):
+  playlist_model = Playlist.objects.get(name=playlist)
+  playlist_model.delete()
+  
