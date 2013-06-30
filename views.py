@@ -28,6 +28,7 @@ def playing(request):
     'playlists': Playlist.objects.all(),
     'queue': queue,
     'video_id': video_id, 
+    'video_title': engine.get_title(playlist, video_id)
   })
   return HttpResponse(template.render(context))
 
@@ -110,7 +111,7 @@ def get_title(request):
   # gets title from DB
   playlist = request.GET.get('playlist', '')
   video_id = request.GET.get('video_id', '')
-  title = Playlist.objects.get(name=playlist).track_set.get(video_id=video_id).title
+  title = engine.get_title(playlist, video_id)
   return HttpResponse(title)
 
 
@@ -129,7 +130,7 @@ def curate(request):
 def delete_playlist(request):
   playlist = request.GET.get('playlist', '')
   engine.delete_playlist(playlist)
-  return render_landing()
+  return redirect('/playapp/')
 
 
 def get_url(playlist, video_id):

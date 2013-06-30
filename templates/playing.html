@@ -15,7 +15,7 @@
 
       // use lastSeen so we don't doublecount markPlayed calls.
       var lastSeen = "";
-      var currentId = "{{ video_id }}";
+      var current_track = make_track("{{ video_id }}", "{{video_title}}");
       var playlist = "{{ playlist }}";
 
       // INITIALIZATION CODE
@@ -43,7 +43,7 @@
         player = new YT.Player('player', {
           height: '390',
           width: '640',
-          videoId: currentId,
+          videoId: current_track.video_id,
           events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange
@@ -75,14 +75,14 @@
       }
 
       function startedPlaying() {
-        if (lastSeen != currentId) {
-          lastSeen = currentId;
-          $.get("mark_played/?playlist=" + playlist + "&video_id=" + currentId, function(data) {});
+        if (lastSeen != current_track.video_id) {
+          lastSeen = current_track.video_id;
+          $.get("mark_played/?playlist=" + playlist + "&video_id=" + current_track.video_id, function(data) {});
         }
       }
 
       function finishedPlaying() {
-        $.get("modify_track/?playlist=" + playlist + "&video_id=" + currentId + "&state=V", function(data) {
+        $.get("modify_track/?playlist=" + playlist + "&video_id=" + current_track.video_id + "&state=V", function(data) {
           nextVideo();
         });
       }
@@ -91,14 +91,14 @@
 
       function thumbsDown() {
         $.get(
-          "modify_track/?playlist=" + playlist + "&video_id=" + currentId + "&state=N",
+          "modify_track/?playlist=" + playlist + "&video_id=" + current_track.video_id + "&state=N",
           function(data) {
             nextVideo();
           });
       }
 
       function thumbsUp() {
-        $.get("modify_track/?playlist=" + playlist + "&video_id=" + currentId + "&state=P", function(data) {});
+        $.get("modify_track/?playlist=" + playlist + "&video_id=" + current_track.video_id + "&state=P", function(data) {});
       }
 
       function remove_from_queue(index) {
@@ -116,7 +116,7 @@
       }
 
       function suggest_play_now(index) {
-        player.loadVideoById(suggestions[index].video_id);
+        set_track_playing(suggestions[index]);
         $.get("modify_track/?playlist=" + playlist + "&video_id=" + suggestions[index].video_id + "&state=V", function(data) {
           refresh_suggestions();
         });
@@ -130,7 +130,7 @@
 
 
       function tired() {
-        $.get("mark_played/?playlist=" + playlist + "&video_id=" + currentId + "&tired=1", function(data) {
+        $.get("mark_played/?playlist=" + playlist + "&video_id=" + current_track.video_id + "&tired=1", function(data) {
           nextVideo();
         });
       }
@@ -140,10 +140,10 @@
         if (value == "no_choice") {
           console.log("default choice selected");
         } else if (value == "a_new_playlist") {
-          window.location = "new_playlist/?video_id=" + currentId;
+          window.location = "new_playlist/?video_id=" + current_track.video_id;
         } else {
           console.log("add to: " + value);
-          $.get("add_track/?playlist=" + value + "&video_id=" + currentId, function(data) {
+          $.get("add_track/?playlist=" + value + "&video_id=" + current_track.video_id, function(data) {
             alert("Track added!");
           });
         }
@@ -152,8 +152,8 @@
       // HELPER FUNCTIONS
 
       function nextVideo() {
-        currentId = queue.shift().video_id;
-        player.loadVideoById(currentId);
+        current_track = queue.shift();
+        set_track_playing(current_track);
         queue_another();
       }
 
@@ -172,7 +172,7 @@
       }
 
       function play_now(index) {
-        player.loadVideoById(queue[index].video_id);
+        set_track_playing(queue[index]);
         remove_from_queue(index);
       }
 
@@ -204,6 +204,11 @@
           }
           console.log("refreshed: " + suggestions);
         });
+      }
+
+      function set_track_playing(track) {
+        current_track = track;
+        player.loadVideoById(current_track.video_id);
       }
 
     </script>

@@ -160,4 +160,7 @@ def get_suggestions(playlist):
 def delete_playlist(playlist):
   playlist_model = Playlist.objects.get(name=playlist)
   playlist_model.delete()
+
+def get_title(playlist, video_id):
+  return Playlist.objects.get(name=playlist).track_set.get(video_id=video_id).title
   
