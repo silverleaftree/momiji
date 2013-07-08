@@ -1,7 +1,6 @@
-<html>
-<head>
-<link rel="stylesheet" type="text/css" href="/static/playlist.css" />
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+{% extends "base.html" %}
+
+{% block content %}
 <script>
   function modify_track(video_id, state) {
     $.get("/playapp/modify_track/?force=1&playlist={{playlist}}&video_id=" + video_id+ "&state=" + state, function(data) {
@@ -9,7 +8,6 @@
     });
   }
 </script>
-</head>
 <h2>Curating playlist: <a href="../?playlist={{playlist}}">{{playlist}}</a></h2>
 
 <form action="../delete_playlist/?" onsubmit="return confirm('Are you sure you want to delete this playlist?')">
@@ -75,5 +73,5 @@
 
 </table>
 </div>
-</body>
-<html>
+
+{% endblock %}

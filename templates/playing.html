@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <link rel="stylesheet" type="text/css" href="/static/playlist.css" />
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-  </head>
-  <body>
+{% extends "base.html" %}
+
+{% block content %}    
     <script>
       // keep in sync with views.DELIMITER
       var DELIMITER = "::VzVQxrhNTX::";
@@ -279,7 +275,5 @@
   {% endfor %}
 </div>
 
-</body>
-</html>
-
+{% endblock %}
 

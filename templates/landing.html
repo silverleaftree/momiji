@@ -1,8 +1,8 @@
-<html>
-  <head>
-    <link rel="stylesheet" type="text/css" href="/static/playlist.css" />
-  </head>
-<body>
+{% extends "base.html" %}
+
+{% block nav %}{% endblock %}
+
+{% block content %}
 Select playlist: <br />
 <div>
 {% for p in playlists %}
@@ -17,5 +17,4 @@ Select playlist: <br />
 <div class="nav_controls">
 <a href="new_playlist">Create new playlist</a>
 </div>
-</body>
-</html>
+{% endblock %}
