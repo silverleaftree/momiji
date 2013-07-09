@@ -208,10 +208,9 @@
       }
 
     </script>
-       <a href="/playapp/"> Navigate<a>
 
-    <h2> Listening to: {{ playlist }} <a href="/playapp/curate/?playlist={{playlist}}">(curate)</a></h2>
-<div class="player_controls">
+
+<div class="player_controls clearfix">
   <div class="player_upper_left">
     <div class="add_video">
     <form action="/playapp/add_track/">
@@ -235,16 +234,23 @@
   </div>
 </div>
 
-<div class="player">
-  <div id="player"></div>
+<div class="player-next clearfix">
+	<div class="fifteen columns alpha player">
+	  <div id="player"></div>
+	</div>
+
+	<div class="one column omega next" onclick="nextVideo()">
+		next
+	</div>
 </div>
 
 <div id="player_controls">
   <button onclick="thumbsUp()">Thumbs up!</button>
   <button onclick="thumbsDown()">Thumbs down!</button>
-  <button onclick="nextVideo()">Next video</button>
   <button onclick="tired()">I'm tired of this track</button>
 </div>
+
+<h2> Listening to: {{ playlist }} <a href="/playapp/curate/?playlist={{playlist}}">(curate)</a></h2>
 
 <div class="video_queue">
   <div class="queue_header"> Upcoming...</div>
