@@ -1,17 +1,31 @@
 <!DOCTYPE html>
 <html>
   <head>
+	<link rel="stylesheet" type="text/css" href="/static/base.css" />
+	<link rel="stylesheet" type="text/css" href="/static/skeleton.css" />
     <link rel="stylesheet" type="text/css" href="/static/playlist.css" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
   </head>
   <body>
 
 
-{% block nav %} default nav  {% endblock %}
-
-{% block content %}
-default content
+{% block nav %} 
+	<div class="nav">
+		<a href="#"><span>Playlists</span></a>
+		<a href="/playapp/new_playlist/"><span>+Playlist</span></a>
+		<a href="/playapp/"><span>Home</span></a>
+	</div>
 {% endblock %}
+
+{% block container %}
+<div class="sixteen columns container">
+
+	{% block content %}
+	default content
+	{% endblock %}
+
+</div>
+{% endblock%} 
 
 </body>
 </html>
