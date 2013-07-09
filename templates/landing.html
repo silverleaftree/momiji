@@ -1,21 +1,22 @@
 {% extends "base.html" %}
 
-{% block nav %}{% endblock %}
-
 {% block container %}
 Select playlist: <br />
 <div>
 {% for p in playlists %}
   <div class="nav_element">
     <div class="nav_element_title"> {{p}} </div>
-    <a href="?playlist={{p}}">
+    <a href="/playapp/?playlist={{p}}">
     <img class="yt_thumbnail" src="http://i3.ytimg.com/vi/{{p.seed_track.video_id}}/hqdefault.jpg" />
     <a>
   </div>
 {% endfor %}
 </div>
 <div class="nav_controls">
-<a href="/playapp/new_playlist/">Create new playlist</a> <br />
-<a href="/playapp/search/">Search for seed</a> <br />
+<form action="/playapp/search_results/">
+Create a new playlist: <input type="text" name="playlist" /> <br />
+Search Query: <input type="text" name="query" /> <br />
+<input type="submit" value="Submit" /> <br />
+</form>
 </div>
 {% endblock %}

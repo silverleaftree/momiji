@@ -107,15 +107,15 @@ a:visited{ color:#ccc; }
   margin: 5px;
 }
 .queue_element_title {
-  width: 135px;
+  width: 145px;
   height: 55px;
 }
 .queue_element_controls {
-  width: 135px;
+  width: 145px;
 }
 
 .yt_thumbnail {
-  width: 135px;
+  width: 145px;
   cursor: pointer;
 }
 .nav_element {
