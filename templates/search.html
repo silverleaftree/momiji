@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+New playlist.
+<form action="/playapp/search_results/">
+Playlist name: <input type="text" name="playlist" /> <br />
+Search query: <input type="text" name="query" /> <br />
+<input type="submit" value="Submit" /> <br />
+</form>
+{% endblock %}

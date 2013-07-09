@@ -3,6 +3,7 @@ from django.template import Context, loader
 from django.shortcuts import redirect
 from playapp.models import Playlist, Track
 import playapp.recommendation_engine as engine
+import playapp.api as api
 import logging
 
 logger = logging.getLogger(__name__)
@@ -131,6 +132,25 @@ def delete_playlist(request):
   playlist = request.GET.get('playlist', '')
   engine.delete_playlist(playlist)
   return redirect('/playapp/')
+
+
+def search(request):
+  template = loader.get_template('search.html')
+  context = Context({
+    })
+  return HttpResponse(template.render(context))
+
+
+def search_results(request):
+  playlist = request.GET.get('playlist', '')
+  query = request.GET.get('query', 'NO_QUERY')
+  tracks = api.get_search_results(query)
+  template = loader.get_template('search_results.html')
+  context = Context({
+    'playlist': playlist,
+    'tracks': tracks,
+    })
+  return HttpResponse(template.render(context))
 
 
 def get_url(playlist, video_id):

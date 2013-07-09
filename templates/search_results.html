@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Select seed for {{playlist}}</h2>
+<div>
+{% for track in tracks %}
+  <div class="queue_element">
+    <div class="queue_element_title"> {{track.title}} </div>
+    <a href="/playapp/create_playlist/?playlist={{playlist}}&video_id={{track.video_id}}">
+      <img class="yt_thumbnail" src="http://i3.ytimg.com/vi/{{track.video_id}}/hqdefault.jpg" />
+    </a>
+  </div>
+{% endfor %}
+</div>
+
+
+{% endblock %}
