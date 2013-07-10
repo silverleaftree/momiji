@@ -125,11 +125,10 @@ def create_track(playlist_model, video_id, weight, state):
 # Creates a new playlist with one seed video
 def initialize_playlist(playlist, video_id_input):
   if Playlist.objects.filter(name=playlist):
-    return False
+    set_track_in_db(playlist, video_id_input, Track.POSITIVE)
   playlist_model = Playlist(name=playlist, creation_date=datetime.now())
   playlist_model.save()
   set_track_in_db(playlist, video_id_input, Track.SEED)
-  return True
   
 def playlist_has_video(playlist_model, video_id):
   return playlist_model.track_set.filter(video_id=video_id)

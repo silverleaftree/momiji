@@ -62,21 +62,19 @@ def new_playlist(request):
 
 
 def create_playlist(request):
-  # create a new playlist
+  # create a new playlist.  
   playlist = request.GET.get('playlist', '')
   video_id = request.GET.get('video_id', '')
-  if engine.initialize_playlist(playlist, video_id):
-    return redirect(get_url(playlist, video_id))
-  else:
-    return redirect('/playapp/new_playlist/')
+  engine.initialize_playlist(playlist, video_id)
+  return redirect(get_url(playlist, video_id))
 
 
 def add_track(request):
   # user adds a track manually
   playlist = request.GET.get('playlist', '')
-  video_id_input = request.GET.get('video_id', '')
-  engine.set_track_in_db(playlist, video_id_input, Track.POSITIVE)
-  return redirect(get_url(playlist, video_id_input))
+  video_id = request.GET.get('video_id', '')
+  engine.set_track_in_db(playlist, video_id, Track.POSITIVE)
+  return redirect(get_url(playlist, video_id))
 
 
 def modify_track(request):
@@ -98,6 +96,7 @@ def mark_played(request):
   tired = (tired_arg == "1")
   engine.mark_played(playlist, video_id, tired=tired)
   return HttpResponse('OK')
+
 
 def get_suggestions(request):
   playlist = request.GET.get('playlist', '')
@@ -145,7 +144,11 @@ def search_results(request):
   playlist = request.GET.get('playlist', '')
   query = request.GET.get('query', 'NO_QUERY')
   tracks = api.get_search_results(query)
-  template = loader.get_template('search_results.html')
+  template = None
+  if Playlist.objects.filter(name=playlist):
+    template = loader.get_template('search_results_add_track.html')
+  else:
+    template = loader.get_template('search_results.html')
   context = Context({
     'playlist': playlist,
     'tracks': tracks,
