@@ -10,6 +10,8 @@ class Playlist(models.Model):
   
   # used by the engine to tell how recently a track was played
   playlist_clock = models.BigIntegerField(default=0)
+  
+  last_played = models.IntegerField(default=0)
 
 
 class Track(models.Model):
