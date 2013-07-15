@@ -16,4 +16,5 @@ urlpatterns = patterns('',
     url(r'^new_playlist/$', views.new_playlist),
     url(r'^search/$', views.search),
     url(r'^search_results/$', views.search_results),
+    url(r'^set_tags/$', views.set_tags),
 )

@@ -15,17 +15,18 @@ def playing(request):
   # playing the requesting piece
   video_id = request.GET.get('video_id', '')
   playlist = request.GET.get('playlist', '')
+  tag = request.GET.get('tag', '')
   template = loader.get_template('playing.html')
   deb_arg = request.GET.get('deb', '0')
   if not playlist:
-    return render_landing();
+    return render_landing(tag);
   
   if not video_id:
     video_id = engine.generate_recommendation(playlist).video_id
   queue = engine.generate_queue(playlist)
   
   context = Context({
-    'playlist': playlist,
+    'playlist': Playlist.objects.get(name=playlist),
     'playlists': Playlist.objects.all(),
     'queue': queue,
     'video_id': video_id, 
@@ -33,8 +34,8 @@ def playing(request):
   })
   return HttpResponse(template.render(context))
 
-def render_landing():
-  playlists = engine.get_playlists_and_seeds()
+def render_landing(tag):
+  playlists = engine.get_playlists_and_seeds(tag)
   context = Context({
     'playlists': playlists,
     })
@@ -95,6 +96,14 @@ def mark_played(request):
   tired_arg = request.GET.get('tired', '0')
   tired = (tired_arg == "1")
   engine.mark_played(playlist, video_id, tired=tired)
+  return HttpResponse('OK')
+
+
+def set_tags(request):
+  # marks track as played in DB
+  playlist = request.GET.get('playlist', '')
+  tags = request.GET.get('tags', '')
+  engine.set_tags(playlist, tags)
   return HttpResponse('OK')
 
 

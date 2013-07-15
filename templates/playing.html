@@ -218,6 +218,8 @@
 
     </script>
 
+<div class="playlist-panel"></div>
+
 <div class="player_controls clearfix">
   <div class="player_upper_left">
     <div class="add_video">
@@ -246,11 +248,11 @@
 </div>
 
 <div class="player-next clearfix">
-	<div class="fifteen columns alpha player">
+	<div class="player fifteen columns alpha">
 	  <div id="player"></div>
 	</div>
 
-	<div class="one column omega next" onclick="nextVideo()">
+	<div class="next one column omega" onclick="nextVideo()">
 		next
 	</div>
 </div>
@@ -291,6 +293,16 @@
     </div>
   {% endfor %}
 </div>
+
+
+<script src="/static/js/script.js"></script>
+<script>
+var currentPlaylist='{{playlist}}';
+	shrinkNavBar();
+	nav.hover(function(){growNavBar();
+		displayCurrentPlaylist(currentPlaylist);
+	},function(){shrinkNavBar()});
+</script>
 
 {% endblock %}
 

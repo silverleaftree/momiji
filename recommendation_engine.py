@@ -62,6 +62,10 @@ def increment_child_track(playlist_model, video_id_input, weight_input):
       track.save()
 
 def generate_queue(playlist):
+  # set the playlist as played now for ordering purposes.
+  playlist_model = Playlist.objects.get(name=playlist)
+  playlist_model.last_played = datetime.now()
+  playlist_model.save()
   queue = []
   for i in range(0,QUEUE_SIZE):
     queue.append(generate_recommendation(playlist));
@@ -144,12 +148,21 @@ def get_ordered_library(playlist):
   upcoming = track_set.filter(state=Track.UNVIEWED).filter(weight__gte=0).order_by('-weight')
   return library, upcoming
   
-def get_playlists_and_seeds():
-  playlists = Playlist.objects.all()
+def get_playlists_and_seeds(tag):
+  playlists = Playlist.objects.all().order_by('-last_played')
+  if tag:
+    filtered = []
+    for playlist in playlists:
+      if tag in get_tags(playlist):
+        filtered.append(playlist)
+    playlists = filtered
   for playlist in playlists:
     seed_track = playlist.track_set.get(state=Track.SEED)
     playlist.seed_track = seed_track
   return playlists
+
+def get_tags(playlist_model):
+  return playlist_model.tags.split(' ')
 
 def get_suggestions(playlist):
   playlist_model = Playlist.objects.get(name=playlist)
@@ -159,6 +172,13 @@ def get_suggestions(playlist):
 def delete_playlist(playlist):
   playlist_model = Playlist.objects.get(name=playlist)
   playlist_model.delete()
+
+
+def set_tags(playlist, tags):
+  playlist_model = Playlist.objects.get(name=playlist)
+  playlist_model.tags = tags
+  playlist_model.save()
+
 
 def get_title(playlist, video_id):
   return Playlist.objects.get(name=playlist).track_set.get(video_id=video_id).title
