@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block content %}    
+{% block content %}
     <script>
       // keep in sync with views.DELIMITER
       var DELIMITER = "::VzVQxrhNTX::";
@@ -27,12 +27,13 @@
       var suggest_titles = new Array();
       var suggest_imgs = new Array();
 
-
       var tag = document.createElement('script');
 
       tag.src = "https://www.youtube.com/iframe_api";
       var firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      var tags_textbox;
 
       var player;
       function onYouTubeIframeAPIReady() {
@@ -58,6 +59,7 @@
         event.target.playVideo();
         refresh_queue();
         refresh_suggestions();
+        tags_textbox = document.getElementById("tags_textbox");
       }
 
       // PLAYER CODE
@@ -145,6 +147,13 @@
         }
       }
 
+      function set_tags() {
+        $.get("/playapp/set_tags/?playlist={{ playlist }}&tags=" + tags_textbox.value, function(data) {
+	      alert("Tags set!");
+        });
+        return false;
+      }
+
       // HELPER FUNCTIONS
 
       function nextVideo() {
@@ -209,13 +218,15 @@
 
     </script>
 
-
 <div class="player_controls clearfix">
   <div class="player_upper_left">
     <div class="add_video">
     <form action="/playapp/search_results/">
       <input type="hidden" name="playlist" value="{{ playlist }}" />
       Search for another video: <input type="text" name="query" />
+    </form>
+    <form onSubmit="return set_tags()">
+	  Set tags: <input id="tags_textbox" type="text" value="{{ playlist.tags }}" />
     </form>
     </div>
   </div>
