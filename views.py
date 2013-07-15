@@ -30,7 +30,7 @@ def playing(request):
     'playlists': Playlist.objects.all(),
     'queue': queue,
     'video_id': video_id, 
-    'video_title': engine.get_title(playlist, video_id)
+    'video_title': engine.get_title(playlist, video_id),
   })
   return HttpResponse(template.render(context))
 
@@ -38,6 +38,7 @@ def render_landing(tag):
   playlists = engine.get_playlists_and_seeds(tag)
   context = Context({
     'playlists': playlists,
+    'tags': engine.get_all_tags(),
     })
   template = loader.get_template('landing.html')
   return HttpResponse(template.render(context))

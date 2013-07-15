@@ -2,7 +2,7 @@
 
 {% block nav %}{% endblock %}
 
-{% block container %}
+{% block content %}
 Select playlist: <br />
 <div>
 {% for p in playlists %}
@@ -20,8 +20,9 @@ Create a new playlist: <input type="text" name="playlist" />
 Search for a seed: <input type="text" name="query" />
 <input type="submit" value="Go!" /> <br />
 </form>
-<form>
-Filter by tag: <input type="text" name="tag" />
-</form>
+Filter by tag:
+{% for tag in tags %}
+<a href="/playapp/?tag={{tag}}">{{tag}}</a>
+{% endfor %}
 </div>
 {% endblock %}

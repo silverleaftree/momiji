@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from playapp.models import Playlist, Track
+from collections import defaultdict
 import playapp.api as api
 import random
 
@@ -163,6 +164,15 @@ def get_playlists_and_seeds(tag):
 
 def get_tags(playlist_model):
   return playlist_model.tags.split(' ')
+
+def get_all_tags():
+  playlists = Playlist.objects.all()
+  tags = defaultdict(int)
+  for playlist in playlists:
+    for tag in get_tags(playlist):
+      tags[tag] += 1
+  sorted_tags = sorted(tags, key=tags.__getitem__, reverse=True)
+  return sorted_tags
 
 def get_suggestions(playlist):
   playlist_model = Playlist.objects.get(name=playlist)
