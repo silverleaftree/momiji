@@ -63,8 +63,18 @@ a:visited{ color:#ccc; }
 	color:#fff;
 }
 
-.nav img{
+.nav #logo{
 	margin:1em 0;
+}
+
+.nav #seedImage{
+	width:80%;
+	display:block;
+}
+
+.nav #nav-links .list span{
+	display:block;
+	font-size:0.8em;
 }
 
 /* #container

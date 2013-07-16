@@ -16,7 +16,7 @@ def playing(request):
   video_id = request.GET.get('video_id', '')
   playlist = request.GET.get('playlist', '')
   tag = request.GET.get('tag', '')
-  template = loader.get_template('playing.html')
+  template = loader.get_template('playing_script.html')
   deb_arg = request.GET.get('deb', '0')
   if not playlist:
     return render_landing(tag);
@@ -25,12 +25,16 @@ def playing(request):
     video_id = engine.generate_recommendation(playlist).video_id
   queue = engine.generate_queue(playlist)
   
+  playlist_model = Playlist.objects.get(name=playlist) 
+  seed_track = playlist_model.track_set.get(state=Track.SEED)
+  
   context = Context({
-    'playlist': Playlist.objects.get(name=playlist),
+    'playlist': playlist_model,
     'playlists': Playlist.objects.all(),
     'queue': queue,
     'video_id': video_id, 
     'video_title': engine.get_title(playlist, video_id),
+    'seed_track': seed_track,
   })
   return HttpResponse(template.render(context))
 
