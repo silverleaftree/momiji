@@ -14,7 +14,7 @@ RECENT_TRACKED = 13 # how many tracks until the model forgets we've played this 
 IM_TIRED_FUTURE = 30
 
 
-STATE_WEIGHTS = { Track.VIEWED : 1, Track.SEED : 3, Track.POSITIVE : 2, Track.NEGATIVE : -1, Track.UNVIEWED : 0 }
+STATE_WEIGHTS = { Track.VIEWED : 1, Track.SEED : 3, Track.POSITIVE : 2, Track.NEGATIVE : -.5, Track.UNVIEWED : 0 }
 
 
 # Sets a track state to state_input if it's allowed.
@@ -130,7 +130,7 @@ def create_track(playlist_model, video_id, weight, state):
 # Creates a new playlist with one seed video
 def initialize_playlist(playlist, video_id_input):
   if Playlist.objects.filter(name=playlist):
-    set_track_in_db(playlist, video_id_input, Track.POSITIVE)
+    return False
   playlist_model = Playlist(name=playlist, creation_date=datetime.now())
   playlist_model.save()
   set_track_in_db(playlist, video_id_input, Track.SEED)

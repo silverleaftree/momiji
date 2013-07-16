@@ -67,8 +67,10 @@ def create_playlist(request):
   # create a new playlist.  
   playlist = request.GET.get('playlist', '')
   video_id = request.GET.get('video_id', '')
-  engine.initialize_playlist(playlist, video_id)
-  return redirect(get_url(playlist, video_id))
+  if engine.initialize_playlist(playlist, video_id):
+    return redirect(get_url(playlist, video_id))
+  else:
+    return redirect('/playapp/')
 
 
 def add_track(request):
