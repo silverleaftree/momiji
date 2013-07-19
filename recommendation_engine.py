@@ -14,7 +14,7 @@ RECENT_FACTOR = Decimal(".6")
 QUEUE_SIZE = 5
 
 # how many tracks until the model forgets we've played this track
-RECENT_TRACKED = 13
+RECENT_TRACKED = 9
 IM_TIRED_FUTURE = 30
 
 STATE_WEIGHTS = {
@@ -54,18 +54,18 @@ def set_track_in_db(playlist, video_id_input, state_input, forced=False, title=N
     create_track(playlist_model, video_id_input, video_weight, state_input, title=title)
 
   # set new weights for children with the weight differential
-  related_video_ids = api.get_related_videos(video_id_input)
-  for related_id in related_video_ids:
+  related_tracks = api.get_related_tracks(video_id_input)
+  for related in related_tracks:
     video_weight *= FACTOR 
-    increment_child_track(playlist_model, related_id, video_weight) 
+    increment_child_track(playlist_model, related['video_id'], video_weight, title=related['title']) 
 
 
-def increment_child_track(playlist_model, video_id_input, weight_input):
+def increment_child_track(playlist_model, video_id_input, weight_input, title=None):
   if weight_input < .01:
     # only record non-zero weights
     return
   if not playlist_has_video(playlist_model, video_id_input):
-    create_track(playlist_model, video_id_input, weight_input, Track.UNVIEWED)
+    create_track(playlist_model, video_id_input, weight_input, Track.UNVIEWED, title=title)
   else:
     track = playlist_model.track_set.get(video_id=video_id_input)
     if track.state == Track.UNVIEWED:
@@ -148,6 +148,7 @@ def initialize_playlist(playlist, video_id_input):
   playlist_model = Playlist(name=playlist, creation_date=datetime.now())
   playlist_model.save()
   set_track_in_db(playlist, video_id_input, Track.SEED)
+  return True
 
 
 def playlist_has_video(playlist_model, video_id):

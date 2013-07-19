@@ -2,8 +2,7 @@
 
 {% block content %}
 <form action="../create_playlist/" onsubmit="return validate();" >
-Name your playlist: <input type="text" name="playlist" /> <br />
-<input type="hidden" name="video_id" value="{{video_id}}"/> <br />
-<br />
+  Name your playlist: <input type="text" name="playlist" /> <br />
+  <input type="hidden" name="video_id" value="{{video_id}}"/> <br />
 </form>
 {% endblock %}

@@ -22,12 +22,15 @@ def get_title(video_id):
   return xml.find(TITLE_TAG).text
 
 
-def get_related_videos(video_id):
+def get_related_tracks(video_id):
   root = get_rec_xml(video_id)
-  ids = []
+  tracks = []
   for entry_element in root.findall(ENTRY_TAG):
-    ids.append(get_id_from_entry_element(entry_element))
-  return ids
+    track = {}
+    track['video_id'] = get_id_from_entry_element(entry_element)
+    track['title'] = get_title_from_entry_element(entry_element)
+    tracks.append(track)
+  return tracks
 
 
 def get_id_from_entry_element(element):

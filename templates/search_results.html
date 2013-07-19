@@ -5,15 +5,15 @@
 Search again: <input type="text" name="query" />
 </form>
 
-<h2>Select seed ...</h2>
+<h2>Select a seed ...</h2>
 <div>
 {% for track in tracks %}
-  <div class="queue_element">
-    <a href="/playapp/new_playlist/?video_id={{track.video_id}}">
+  <a href="/playapp/new_playlist/?video_id={{track.video_id}}">
+    <div class="queue_element">
       <div class="queue_element_title"> {{track.title}} </div>
       <img class="yt_thumbnail" src="http://i3.ytimg.com/vi/{{track.video_id}}/hqdefault.jpg" />
-    </a>
-  </div>
+    </div>
+  </a>
 {% endfor %}
 </div>
 

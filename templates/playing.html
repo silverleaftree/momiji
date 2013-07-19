@@ -58,15 +58,14 @@
   <button onclick="tired()">I'm tired of this track</button>
 </div>
 
-<h2> Listening to: {{ playlist }} <a href="/playapp/curate/?playlist={{playlist}}">(curate)</a></h2>
-
 <div class="video_queue">
   <div class="queue_header"> Upcoming...</div>
   {% for track in queue %}
     <div class="queue_element">
-      <div class="queue_element_title" id="queue_title_{{forloop.counter0}}" >
+      <div onclick="suggest_play_now({{forloop.counter0}})">
+        <div class="queue_element_title" id="queue_title_{{forloop.counter0}}"></div>
+        <img class="yt_thumbnail" id="queue_img_{{forloop.counter0}}" />
       </div>
-      <img class="yt_thumbnail" id="queue_img_{{forloop.counter0}}" src="" onclick="play_now({{forloop.counter0}})" />
       <div class="queue_element_controls">
         <button onclick="remove_from_queue({{forloop.counter0}})">X</button>
         <button onclick="thumbs_down_from_queue({{forloop.counter0}})">Thumbs down!</button>
@@ -75,13 +74,14 @@
   {% endfor %}
 </div>
 
-<div class="video_queue">
+<div class="video_queue clearfix">
   <div class="queue_header"> You might like...</div>
   {% for track in queue %}
     <div class="queue_element">
-      <div class="queue_element_title" id="suggest_title_{{forloop.counter0}}" > {{track}}
+      <div onclick="suggest_play_now({{forloop.counter0}})">
+        <div class="queue_element_title" id="suggest_title_{{forloop.counter0}}"></div>
+        <img class="yt_thumbnail" id="suggest_img_{{forloop.counter0}}" />
       </div>
-      <img class="yt_thumbnail" id="suggest_img_{{forloop.counter0}}" src="" onclick="suggest_play_now({{forloop.counter0}})" />
       <div class="queue_element_controls">
         <button onclick="suggest_thumbs_down({{forloop.counter0}})">Not Interested</button>
       </div>
@@ -89,6 +89,9 @@
   {% endfor %}
 </div>
 
+<div class="footer">
+ <a href="/playapp/curate/?playlist={{playlist}}">curate this playlist</a>
+</div>
 {% block playing_script %}
 {% endblock %}
 

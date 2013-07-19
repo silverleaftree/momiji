@@ -6,12 +6,12 @@
 Select playlist: <br />
 <div>
 {% for p in playlists %}
-  <div class="nav_element">
-    <a href="/playapp/?playlist={{p}}">
-      <div class="nav_element_title"> {{p}} </div>
+  <a href="/playapp/?playlist={{p}}">
+    <div class="queue_element">
+      <div class="queue_element_title"> {{p}} </div>
       <img class="yt_thumbnail" src="http://i3.ytimg.com/vi/{{p.seed_track.video_id}}/hqdefault.jpg" />
-    <a>
-  </div>
+    </div>
+  </a>
 {% endfor %}
 </div>
 <div class="nav_controls">

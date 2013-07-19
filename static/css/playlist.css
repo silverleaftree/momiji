@@ -139,11 +139,13 @@ a:visited{ color:#ccc; }
 
 .queue_element {
   float: left;
-  margin: 5px;
+  margin: 10px;
 }
 .queue_element_title {
   width: 160px;
-  height: 55px;
+  height: 40px;
+  margin: 0px;
+  cursor: pointer;
 }
 .queue_element_controls {
   width: 160px;
@@ -152,6 +154,7 @@ a:visited{ color:#ccc; }
 .yt_thumbnail {
   width: 160px;
   cursor: pointer;
+  margin: 0px;
 }
 .nav_element {
   float: left;
@@ -167,9 +170,10 @@ a:visited{ color:#ccc; }
 }
 .video_queue {
   clear: both;
-  margin: 25px;
+  margin: 0px;
 }
 .queue_header {
+  margin: 0px;
   font-weight: bold;
   font-size: large;
 }
@@ -186,6 +190,13 @@ a:visited{ color:#ccc; }
 }
 .player {
   clear: both;
+}
+.footer {
+  clear: both;
+}
+
+.curate td {
+ border: 2px solid white;
 }
 
 /* #Page Styles
