@@ -7,9 +7,9 @@ Select playlist: <br />
 <div>
 {% for p in playlists %}
   <div class="nav_element">
-    <div class="nav_element_title"> {{p}} </div>
     <a href="/playapp/?playlist={{p}}">
-    <img class="yt_thumbnail" src="http://i3.ytimg.com/vi/{{p.seed_track.video_id}}/hqdefault.jpg" />
+      <div class="nav_element_title"> {{p}} </div>
+      <img class="yt_thumbnail" src="http://i3.ytimg.com/vi/{{p.seed_track.video_id}}/hqdefault.jpg" />
     <a>
   </div>
 {% endfor %}

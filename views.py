@@ -16,7 +16,7 @@ def playing(request):
   video_id = request.GET.get('video_id', '')
   playlist = request.GET.get('playlist', '')
   tag = request.GET.get('tag', '')
-  template = loader.get_template('playing.html')
+  template = loader.get_template('playing_script.html')
   deb_arg = request.GET.get('deb', '0')
   if not playlist:
     return render_landing(tag);
@@ -25,14 +25,20 @@ def playing(request):
     video_id = engine.generate_recommendation(playlist).video_id
   queue = engine.generate_queue(playlist)
   
+  playlist_model = Playlist.objects.get(name=playlist)
+  playlists = Playlist.objects.order_by("-last_played")
+  playlists_alphabetical = Playlist.objects.order_by("name")
+  
   context = Context({
-    'playlist': Playlist.objects.get(name=playlist),
-    'playlists': Playlist.objects.all(),
+    'playlist': playlist_model,
+    'playlists': playlists,
+    'playlists_alphabetical': playlists_alphabetical,
     'queue': queue,
     'video_id': video_id, 
     'video_title': engine.get_title(playlist, video_id),
   })
   return HttpResponse(template.render(context))
+
 
 def render_landing(tag):
   playlists = engine.get_playlists_and_seeds(tag)
@@ -70,7 +76,7 @@ def create_playlist(request):
   if engine.initialize_playlist(playlist, video_id):
     return redirect(get_url(playlist, video_id))
   else:
-    return redirect('/playapp/')
+    return redirect('/playapp/new_playlist/?video_id=' + video_id)
 
 
 def add_track(request):

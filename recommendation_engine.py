@@ -7,19 +7,28 @@ import random
 
 
 # model math stuff
-FACTOR = .6 # how much we decay per related item.
-RECENT_FACTOR = Decimal(".6") # how much we decay the chance for a recently played track, per track played
+# how much we decay per related item.
+FACTOR = .6
+# how much we decay the chance for a recently played track, per track played
+RECENT_FACTOR = Decimal(".6")
 QUEUE_SIZE = 5
-RECENT_TRACKED = 13 # how many tracks until the model forgets we've played this track
+
+# how many tracks until the model forgets we've played this track
+RECENT_TRACKED = 13
 IM_TIRED_FUTURE = 30
 
-
-STATE_WEIGHTS = { Track.VIEWED : 1, Track.SEED : 3, Track.POSITIVE : 2, Track.NEGATIVE : -.5, Track.UNVIEWED : 0 }
+STATE_WEIGHTS = {
+  Track.VIEWED : 1,
+  Track.SEED : 3,
+  Track.POSITIVE : 2,
+  Track.NEGATIVE : -1,
+  Track.UNVIEWED : 0,
+}
 
 
 # Sets a track state to state_input if it's allowed.
 # playlist must exist, video_id might not.
-def set_track_in_db(playlist, video_id_input, state_input, forced=False):
+def set_track_in_db(playlist, video_id_input, state_input, forced=False, title=None):
   # try to lookup the track
   playlist_model = Playlist.objects.get(name=playlist)
   video_weight = STATE_WEIGHTS[state_input]
@@ -42,13 +51,14 @@ def set_track_in_db(playlist, video_id_input, state_input, forced=False):
     existing_track.save()
   else:
     print 'adding new track: ' + video_id_input
-    create_track(playlist_model, video_id_input, video_weight, state_input)
+    create_track(playlist_model, video_id_input, video_weight, state_input, title=title)
 
   # set new weights for children with the weight differential
   related_video_ids = api.get_related_videos(video_id_input)
   for related_id in related_video_ids:
     video_weight *= FACTOR 
     increment_child_track(playlist_model, related_id, video_weight) 
+
 
 def increment_child_track(playlist_model, video_id_input, weight_input):
   if weight_input < .01:
@@ -62,6 +72,7 @@ def increment_child_track(playlist_model, video_id_input, weight_input):
       track.weight += Decimal(str(weight_input))
       track.save()
 
+
 def generate_queue(playlist):
   # set the playlist as played now for ordering purposes.
   playlist_model = Playlist.objects.get(name=playlist)
@@ -71,6 +82,7 @@ def generate_queue(playlist):
   for i in range(0,QUEUE_SIZE):
     queue.append(generate_recommendation(playlist));
   return queue
+
 
 def generate_recommendation(playlist):
   # only recommend positive weights
@@ -101,8 +113,8 @@ def effective_weight(track_model, playlist_model):
     return track_model.weight
 
 
-# Moves playlist clock forward one tick, marks current video id as played so it doesn't come up
-# so soon.
+# Moves playlist clock forward one tick, marks current video id as
+# played so it doesn't come up so soon.
 def mark_played(playlist, video_id, increment_clock=True, tired=False):
   playlist_model = Playlist.objects.get(name=playlist)
   if increment_clock:
@@ -117,8 +129,9 @@ def mark_played(playlist, video_id, increment_clock=True, tired=False):
 
 
 # adds the video id with current state to the DB
-def create_track(playlist_model, video_id, weight, state):
-  title = api.get_title(video_id)
+def create_track(playlist_model, video_id, weight, state, title=None):
+  if not title:
+    title = api.get_title(video_id)
   playlist_model.track_set.create(
     video_id=video_id,
     weight=Decimal(str(weight)),
@@ -127,16 +140,25 @@ def create_track(playlist_model, video_id, weight, state):
     creation_date=datetime.now(),
     )
 
+
 # Creates a new playlist with one seed video
 def initialize_playlist(playlist, video_id_input):
-  if Playlist.objects.filter(name=playlist):
+  if not valid_playlist(playlist):
     return False
   playlist_model = Playlist(name=playlist, creation_date=datetime.now())
   playlist_model.save()
   set_track_in_db(playlist, video_id_input, Track.SEED)
-  
+
+
 def playlist_has_video(playlist_model, video_id):
   return playlist_model.track_set.filter(video_id=video_id)
+
+
+def valid_playlist(playlist):
+  return (
+    playlist and not '"' in playlist and not "'" in playlist and
+    len(Playlist.objects.filter(name=playlist)) == 0
+  )
 
 
 def get_ordered_library(playlist):
@@ -148,7 +170,8 @@ def get_ordered_library(playlist):
   library.extend(track_set.filter(state=Track.NEGATIVE))
   upcoming = track_set.filter(state=Track.UNVIEWED).filter(weight__gte=0).order_by('-weight')
   return library, upcoming
-  
+
+
 def get_playlists_and_seeds(tag):
   playlists = Playlist.objects.all().order_by('-last_played')
   if tag:
@@ -162,8 +185,10 @@ def get_playlists_and_seeds(tag):
     playlist.seed_track = seed_track
   return playlists
 
+
 def get_tags(playlist_model):
   return playlist_model.tags.split(' ')
+
 
 def get_all_tags():
   playlists = Playlist.objects.all()
@@ -174,10 +199,12 @@ def get_all_tags():
   sorted_tags = sorted(tags, key=tags.__getitem__, reverse=True)
   return sorted_tags
 
+
 def get_suggestions(playlist):
   playlist_model = Playlist.objects.get(name=playlist)
   positive_tracks = playlist_model.track_set.filter(state=Track.UNVIEWED).filter(weight__gt=0)
   return positive_tracks.order_by('-weight')[:QUEUE_SIZE]
+
 
 def delete_playlist(playlist):
   playlist_model = Playlist.objects.get(name=playlist)
