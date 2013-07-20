@@ -236,6 +236,11 @@ playlists.click(
     return false;
   }
 
+  function play_now(index) {
+    set_track_playing(queue[index]);
+    remove_from_queue(index);
+  }
+
   // HELPER FUNCTIONS
 
   function nextVideo() {
@@ -256,11 +261,6 @@ playlists.click(
       queue_imgs[i].src = THUMB_PRE + queue[i].video_id + THUMB_POST;
       queue_titles[i].innerHTML = queue[i].title.substring(0,35);
     }
-  }
-
-  function play_now(index) {
-    set_track_playing(queue[index]);
-    remove_from_queue(index);
   }
 
   function parse_track(response) {

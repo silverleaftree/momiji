@@ -62,7 +62,7 @@
   <div class="queue_header"> Upcoming...</div>
   {% for track in queue %}
     <div class="queue_element">
-      <div onclick="suggest_play_now({{forloop.counter0}})">
+      <div onclick="play_now({{forloop.counter0}})">
         <div class="queue_element_title" id="queue_title_{{forloop.counter0}}"></div>
         <img class="yt_thumbnail" id="queue_img_{{forloop.counter0}}" />
       </div>
